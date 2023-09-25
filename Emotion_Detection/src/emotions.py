@@ -11,7 +11,6 @@ from tensorflow.keras.layers import MaxPooling2D
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 import os
 import time
-from InfoUpdate import JSONInfo_update
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 # command line argument
@@ -132,7 +131,6 @@ elif mode == "display":
                 if exist_face_json == True:
                     ####update json file
                     print('update exist data to False')
-                    JSONInfo_update('...\PersonStatus.json', "exit", False)
                     exist_face_json = False
                     print('cannot find face now')
 
@@ -143,7 +141,6 @@ elif mode == "display":
             if exist_face_json == False:
                 ####update json file
                 print('update exist data True')
-                JSONInfo_update('...\PersonStatus.json', "exit", True)
                 exist_face_json = True
                 print('find face now')
             if NeedAnalyzeEmotion == True:
@@ -152,7 +149,6 @@ elif mode == "display":
                 prediction = model.predict(cropped_img)
                 maxindex = int(np.argmax(prediction))
                 print(emotion_dict[maxindex])
-                JSONInfo_update('...\PersonStatus.json', "face_emotion", emotion_dict[maxindex])
                 print('update emotion data')
             #cv2.putText(frame, emotion_dict[maxindex], (x+20, y-60), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
             time.sleep(5)
