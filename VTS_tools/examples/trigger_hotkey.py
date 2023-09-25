@@ -19,7 +19,7 @@ async def main():
         hotkey_list.append(hotkey["name"])
     print(hotkey_list)  # ['My Animation 1', 'My Animation 2', ...]
 
-    send_hotkey_request = myvts.vts_request.requestTriggerHotKey(hotkey_list[0])
+    send_hotkey_request = myvts.vts_request.requestTriggerHotKey(hotkey_list[1])
     await myvts.request(send_hotkey_request)  # send request to play 'My Animation 1'
     await myvts.close()
 

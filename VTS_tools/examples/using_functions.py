@@ -11,12 +11,12 @@ async def trigger(myvts):
     await myvts.connect()
     await myvts.request_authenticate()
     response_data = await myvts.request(myvts.vts_request.requestHotKeyList())
-    print(response_data)
+    #print(response_data)
     hotkey_list = []
     for hotkey in response_data["data"]["availableHotkeys"]:
-        hotkey_list.append(hotkey["file"])
+        hotkey_list.append(hotkey["hotkeyID"])
     print(hotkey_list)
-    send_hotkey_request = myvts.vts_request.requestTriggerHotKey(hotkey_list[2])
+    send_hotkey_request = myvts.vts_request.requestTriggerHotKey(hotkey_list[1])
     await myvts.request(send_hotkey_request)  # send request to play 'My Animation 1'
     await myvts.close()
 
