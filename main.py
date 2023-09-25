@@ -19,6 +19,7 @@ from SentimentEngine.SentimentEngine import SentimentEngine
 #from requests_toolbelt.multipart.encoder import MultipartEncoder
 #import requests
 
+# Function selection
 SpeechFunction = True
 FlaskFunction = False
 keyboardFunction = False
@@ -35,7 +36,7 @@ def speech_recognition_thread():
     global question_list
     # 定义关键词列表
     keywords = ["你好", "在吗", "奈奈"]
-    DuringChatting = False
+    DuringChatting = True
 
     while True:
         with sr.Microphone() as source:
