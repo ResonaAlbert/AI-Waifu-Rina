@@ -3,25 +3,30 @@ import time
 import os
 
 def JSONInfo_update(filename, data_name, Data):
-    #abs_path = os.path.dirname(__file__)
-    # 打开文件
-    #path = os.path.join(abs_path,"PersonStatus.json")
-    #path = "./PersonStatus.json"
-    with open(filename, "r") as f:
-        data = json.load(f)
+   # Get the absolute path of the current file
+   abs_path = os.path.dirname(__file__)
+   # Construct the path to the JSON file
+   path = os.path.join(abs_path, filename)
 
-    # 如果文件不存在，就创建一个
-    if not data:
-        data = {}
+   # Open the JSON file in read mode
+   with open(path, "r") as f:
+       # Load the JSON data
+       data = json.load(f)
 
-    # 更新数据
-    data[data_name] = Data
+   # If the JSON data is empty, create an empty dictionary
+   if not data:
+       data = {}
 
-    # 写入文件
-    with open(filename, "w") as f:
-        json.dump(data, f)
+   # Update the data
+   data[data_name] = Data
 
+   # Write the updated JSON data to the file
+   with open(path, "w") as f:
+       json.dump(data, f)
+
+# Update the "last_talk_time" value in the "PersonStatus.json" file
 #TTT = time.time()
 #updatejsonfile('PersonStatus.json', "last_talk_time", TTT)
 
-#time.sleep(5)
+# Sleep for 5 seconds
+# time.sleep(5)
