@@ -1,2 +1,4 @@
 paimon_sentiment.onnx
 Emotion_Detection/src/fer2013.csv
+.cemotion_cache/cemotion_2.0.pt
+*.pt

@@ -21,8 +21,8 @@ async def Hotkeyrequire(myvts):
     for hotkey in response_data["data"]["availableHotkeys"]:
         hotkeyname_list.append(hotkey["file"])
     #print(hotkeyname_list)  # ['My Animation 1', 'My Animation 2', ...]
-    for i in range(len(hotkeyname_list)):
-        print(f"{i}:{hotkeyname_list[i]}")
+    #for i in range(len(hotkeyname_list)):
+    #    print(f"{i}:{hotkeyname_list[i]}")
 
     return hotkey_list, hotkeyname_list
 
@@ -30,16 +30,13 @@ async def send_hotkey_request(myvts, hotkey_id):
     send_hotkey_request = myvts.vts_request.requestTriggerHotKey(hotkey_id)
     await myvts.request(send_hotkey_request)
 
-    return None
-
 async def set_parameter_value(myvts, parameter_name, parameter_value):
     
     set_parameter_value = myvts.vts_request.requestSetParameterValue(
         parameter_name, parameter_value
     )
     await myvts.request(set_parameter_value)
-    
-    return None
+
 
 
 async def VTS_threading():
@@ -53,6 +50,7 @@ async def VTS_threading():
 
     hotkey_list, hotkeyname_list = await Hotkeyrequire(myvts)
     i = 1
+    
     await send_hotkey_request(myvts, hotkey_list[i])
     time.sleep(15)
     await set_parameter_value(myvts, "FaceAngleX", 0)

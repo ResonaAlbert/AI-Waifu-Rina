@@ -3,7 +3,11 @@ from HealthInfo.InfoUpdate import JSONInfo_update
 from LLM_tools.zhipuai_API import ask_zhipu
 
 def LLM_module(question):
-    response = ask_zhipu(question)
+    Use_LLM = False
+    if Use_LLM == True:
+        response = ask_zhipu(question)
+    else:
+        response = question
     #response = '' + question
     time.sleep(0)
     last_talk_time = time.time()

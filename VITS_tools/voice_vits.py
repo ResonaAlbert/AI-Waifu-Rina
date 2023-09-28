@@ -5,8 +5,14 @@ from flask import Flask, request, jsonify
 import requests
 import random
 import string
-
-def voice_vits(text, id=726, format="wav", lang="auto", length=1.1, noise=0.667, noisew=0.8, max=50):
+import asyncio
+from tools.dirempty import check_dir_empty
+from tools.google_translate import translate_to_japanese
+from tools.splitsentence import split_chinese_text, split_japanese_sentences
+import threading
+                    
+                     # 736
+def voice_vits(text, id=36, format="wav", lang="auto", length=1.1, noise=0.667, noisew=0.8, max=5, filename = "out"):
     fields = {
         "text": text,
         "id": str(id),
@@ -18,20 +24,25 @@ def voice_vits(text, id=726, format="wav", lang="auto", length=1.1, noise=0.667,
         "max": str(max)
     }
     boundary = '----VoiceConversionFormBoundary' + ''.join(random.sample(string.ascii_letters + string.digits, 16))
-    base = "http://127.0.0.1:23456"
+    
+    print("VITS start generate:")
+    
+    base = "https://artrajz-vits-simple-api.hf.space"
+    #base = "http://127.0.0.1:23456"
+    
     m = MultipartEncoder(fields=fields, boundary=boundary)
     headers = {"Content-Type": m.content_type}
     url = f"{base}/voice"
 
     res = requests.post(url=url, data=m, headers=headers)
     abs_path = os.path.dirname(__file__)
-    path = f"{abs_path}/audio_log/out.wav"
+    path = f"{abs_path}/audio_log/{filename}.wav"
 
+    print("VITS generate:", text)
+    
     with open(path, "wb") as f:
         f.write(res.content)
-    #print(path)
-
-    winsound.PlaySound(path, winsound.SND_FILENAME)
+    #winsound.PlaySound(path, winsound.SND_FILENAME)
     
     return path
 
@@ -55,3 +66,33 @@ def play_audio_files(folder_path):
     # 逐个删除这些文件
     for file in files:
         os.remove(os.path.join(folder_path, file))
+
+def play_all_audio():
+    #start_time = time.time()
+    wav_path = "./VITS_tools/audio_log"
+    while True:
+        if check_dir_empty(wav_path) == False:
+            play_audio_files(wav_path)
+            #if time.time() - start_time > 20:
+            #    break
+            # time.sleep(0.5)
+    print("check audio end!")
+
+def voice_vits_seperate(text, LANGUAGE):
+        i = 1
+        for sentence in text:
+            filename = "out" + str(i)
+            voice_vits(text=sentence, lang=LANGUAGE, filename = filename)
+            i += 1
+        return None
+
+def VITS_module(response, VITS_once, LANGUAGE):
+    LANGUAGE = "ja" # LANGUAGE = ja en ko zh
+    response_JP = translate_to_japanese(response)
+    if VITS_once == False:
+        response_JP_sentences = split_japanese_sentences(response_JP)
+        VITS_thread = threading.Thread(target=voice_vits_seperate(response_JP_sentences, LANGUAGE))
+        VITS_thread.start()
+    else:
+        #filename = "out"
+        voice_vits(text=response_JP, lang=LANGUAGE, filename = "out")
