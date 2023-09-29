@@ -13,6 +13,7 @@ from LLM_tools import AskLLM
 from SentimentEngine.SentimentEngine import SentimentEngine
 from VTS_tools.VTS_Module import VTS_threading
 from cemotion import Cemotion
+import demand
 #from LLM_tools.LLM.LLM_module import LLM_module
 #import winsound
 #import random
@@ -21,7 +22,7 @@ from cemotion import Cemotion
 #import requests
 
 # Setting Function
-SpeechInput_Function = True
+SpeechInput_Function = False
 ClientInput_Function = False
 KeyboardInput_Function = True
 VITS_Funtion = True
@@ -182,45 +183,50 @@ if __name__ == "__main__":
 
             #from questionlist check question
             [exit_question ,question_current] = use_questionlist(question_list)
-            #ask GPT for resqonse
-            response = AskLLM.LLM_module(question_current)
-
-            if SentimentEngineFunction == True:
-                c = Cemotion()
-                Sentiments = c.predict(response)  
-                # Sentiments = SECheck.infer(response)
-                print("情感等级: ", Sentiments)
             
-            
-            if Sentiments >= 0.9: 
-                if JSONInfo_get('./PersonStatus.json', "heartrate") > 90:
-                    hotkey = 6
-                else:
-                    hotkey = 19
-            elif Sentiments >= 0.7:
-                hotkey = 9
-            elif Sentiments >= 0.3:
-                hotkey = 1
+            task_number = demand.command_mode(question_current)
+            if task_number != False:
+                demand.run_task_list(task_number)
             else:
-                hotkey = 8
-            
+                #ask GPT for resqonse
+                response = AskLLM.LLM_module(question_current)
 
-            if VTS_Function == True:
-                asyncio_VTS_thread = threading.Thread(target=lambda: asyncio.run(VTS_threading(hotkey)))
-                asyncio_VTS_thread.start()
+                if SentimentEngineFunction == True:
+                    c = Cemotion()
+                    Sentiments = c.predict(response)  
+                    # Sentiments = SECheck.infer(response)
+                    print("情感等级: ", Sentiments)
+                
+                
+                if Sentiments >= 0.9: 
+                    if JSONInfo_get('./PersonStatus.json', "heartrate") > 90:
+                        hotkey = 6
+                    else:
+                        hotkey = 19
+                elif Sentiments >= 0.7:
+                    hotkey = 9
+                elif Sentiments >= 0.3:
+                    hotkey = 1
+                else:
+                    hotkey = 8
+                
 
-            #show the Q&A
-            print("Q：", question_current)
-            print("A：", response)
-
-            # VITS voice generation and play
-            if VITS_Funtion == True:
-                VITS_module(response, VITS_once, "ja")
-            
-            if VTS_Function == True:
-                if hotkey != 1:
-                    time.sleep(3)
+                if VTS_Function == True:
                     asyncio_VTS_thread = threading.Thread(target=lambda: asyncio.run(VTS_threading(hotkey)))
                     asyncio_VTS_thread.start()
+
+                #show the Q&A
+                print("Q：", question_current)
+                print("A：", response)
+
+                # VITS voice generation and play
+                if VITS_Funtion == True:
+                    VITS_module(response, VITS_once, "ja")
+                
+                if VTS_Function == True:
+                    if hotkey != 1:
+                        time.sleep(3)
+                        asyncio_VTS_thread = threading.Thread(target=lambda: asyncio.run(VTS_threading(hotkey)))
+                        asyncio_VTS_thread.start()
 
         time.sleep(0)
