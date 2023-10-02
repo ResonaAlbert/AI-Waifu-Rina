@@ -22,20 +22,18 @@ import demand
 #import requests
 
 # Setting Function
-SpeechInput_Function = False
-ClientInput_Function = False
+SpeechInput_Function = True
+ClientInput_Function = True
 KeyboardInput_Function = True
 VITS_Funtion = True
 VTS_Function = True
 #不分割文本课程
-VITS_once = False
+VITS_once = True
 SentimentEngineFunction = True
 
 #### recording and speech recognize ####
 # 创建一个Recognizer对象
 recognizer = sr.Recognizer()
-
-
 
 # 定义语音识别线程函数
 def speech_recognition_thread():
@@ -197,18 +195,17 @@ if __name__ == "__main__":
                     # Sentiments = SECheck.infer(response)
                     print("情感等级: ", Sentiments)
                 
-                
-                if Sentiments >= 0.9: 
-                    if JSONInfo_get('./PersonStatus.json', "heartrate") > 90:
-                        hotkey = 6
+                    if Sentiments >= 0.9: 
+                        if JSONInfo_get('./PersonStatus.json', "heartrate") > 90:
+                            hotkey = 6
+                        else:
+                            hotkey = 19
+                    elif Sentiments >= 0.7:
+                        hotkey = 9
+                    elif Sentiments >= 0.3:
+                        hotkey = 1
                     else:
-                        hotkey = 19
-                elif Sentiments >= 0.7:
-                    hotkey = 9
-                elif Sentiments >= 0.3:
-                    hotkey = 1
-                else:
-                    hotkey = 8
+                        hotkey = 8
                 
 
                 if VTS_Function == True:

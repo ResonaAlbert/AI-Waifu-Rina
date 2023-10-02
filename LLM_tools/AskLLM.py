@@ -3,7 +3,7 @@ from HealthInfo.InfoUpdate import JSONInfo_update
 from LLM_tools.zhipuai_API import ask_zhipu
 
 def LLM_module(question):
-    Use_LLM = False
+    Use_LLM = True
     if Use_LLM == True:
         response = ask_zhipu(question)
     else:

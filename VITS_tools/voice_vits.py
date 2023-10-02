@@ -88,7 +88,8 @@ def voice_vits_seperate(text, LANGUAGE):
 
 def VITS_module(response, VITS_once, LANGUAGE):
     LANGUAGE = "ja" # LANGUAGE = ja en ko zh
-    response_JP = translate_to_japanese(response)
+    LANGUAGE = "zh"
+    response_JP = response#translate_to_japanese(response)
     if VITS_once == False:
         response_JP_sentences = split_japanese_sentences(response_JP)
         VITS_thread = threading.Thread(target=voice_vits_seperate(response_JP_sentences, LANGUAGE))

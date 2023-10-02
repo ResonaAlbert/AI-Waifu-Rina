@@ -49,6 +49,8 @@ async def VTS_threading():
     await myvts.request_authenticate()  # use token
 
     hotkey_list, hotkeyname_list = await Hotkeyrequire(myvts)
+    print(hotkey_list)
+    print(hotkeyname_list)
     i = 1
     
     await send_hotkey_request(myvts, hotkey_list[i])

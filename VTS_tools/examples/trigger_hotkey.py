@@ -17,17 +17,22 @@ async def main():
 
     response_data = await myvts.request(myvts.vts_request.requestHotKeyList())
     hotkey_list = []
+    hotkey_name = []
     for hotkey in response_data["data"]["availableHotkeys"]:
         hotkey_list.append(hotkey["hotkeyID"])
+    for hotkey in response_data["data"]["availableHotkeys"]:
+        hotkey_name.append(hotkey["file"])
     #print(hotkey_list)  # ['My Animation 1', 'My Animation 2', ...]
-
-    send_hotkey_request = myvts.vts_request.requestTriggerHotKey(hotkey_list[1])
+    print(hotkey_name)
+    #print(hotkey_name)
+    send_hotkey_request = myvts.vts_request.requestTriggerHotKey(hotkey_list[6])
     await myvts.request(send_hotkey_request)  # send request to play 'My Animation 1'
+
     await myvts.close()
 
 
 if __name__ == "__main__":
     
-    while True:
-        asyncio.run(main())
-        time.sleep(20)
+    #while True:
+    asyncio.run(main())
+        #time.sleep(20)
