@@ -27,7 +27,7 @@ def split_chinese_text(text):
 
     return sentence_array
 
-def split_japanese_sentences(text):
+def split_japanese_sentences(text, min_length=8):
     # 使用正则表达式定义句子分隔符（句号、问号、感叹号、省略号）
     sentence_delimiters = r'。|？|！|…'
 
@@ -36,6 +36,17 @@ def split_japanese_sentences(text):
 
     # 去除空白句子
     sentences = [sentence.strip() for sentence in sentences if sentence.strip()]
+
+    # 遍历每个句子
+    for i, sentence in enumerate(sentences):
+        # 如果句子长度小于指定长度，则合并到下一个句子
+            if len(sentence) < min_length & i <= len(sentences):
+                # 获取下一个句子
+                next_sentence = sentences[i + 1]
+                # 合并两个句子
+                sentences[i] = sentence + next_sentence
+                # 删除下一个句子
+                sentences.pop(i + 1)
 
     return sentences
 

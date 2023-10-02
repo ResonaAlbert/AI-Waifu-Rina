@@ -1,18 +1,16 @@
 from requests_toolbelt.multipart.encoder import MultipartEncoder
 import os
 import winsound
-from flask import Flask, request, jsonify
 import requests
 import random
 import string
-import asyncio
-from tools.dirempty import check_dir_empty
-from tools.google_translate import translate_to_japanese
-from tools.splitsentence import split_chinese_text, split_japanese_sentences
+from tools import language_tool as LT
 import threading
+import time
+import re
                     
-                     # 736
-def voice_vits(text, id=36, format="wav", lang="auto", length=1.1, noise=0.667, noisew=0.8, max=5, filename = "out"):
+                     # 736 36
+def voice_vits(text, id=118, format="wav", lang="auto", length=1.1, noise=0.667, noisew=0.8, max=5, filename = "out"):
     fields = {
         "text": text,
         "id": str(id),
@@ -62,19 +60,20 @@ def play_audio_files(folder_path):
         winsound.PlaySound(audio_path, winsound.SND_FILENAME)
 
     # 获取子文件夹中的所有文件
-    files = os.listdir(folder_path)
+    #files = os.listdir(folder_path)
     # 逐个删除这些文件
-    for file in files:
+    for file in audio_files:
         os.remove(os.path.join(folder_path, file))
 
-def play_all_audio():
-    #start_time = time.time()
+async def play_all_audio():
+    start_time = time.time()
     wav_path = "./VITS_tools/audio_log"
     while True:
-        if check_dir_empty(wav_path) == False:
+        if LT.check_dir_empty(wav_path) == False:
+            start_time = time.time()
             play_audio_files(wav_path)
-            #if time.time() - start_time > 20:
-            #    break
+        if time.time() - start_time > 20:
+            break
             # time.sleep(0.5)
     print("check audio end!")
 
@@ -86,12 +85,13 @@ def voice_vits_seperate(text, LANGUAGE):
             i += 1
         return None
 
-def VITS_module(response, VITS_once, LANGUAGE):
+async def VITS_module(response, VITS_once, LANGUAGE):
     LANGUAGE = "ja" # LANGUAGE = ja en ko zh
-    LANGUAGE = "zh"
-    response_JP = response#translate_to_japanese(response)
+    #LANGUAGE = "zh"
+    response_JP = LT.translate_to_japanese(response)
+    response_JP = response_JP.replace("兄弟", "お兄ちゃん")
     if VITS_once == False:
-        response_JP_sentences = split_japanese_sentences(response_JP)
+        response_JP_sentences = LT.split_japanese_sentences(response_JP)
         VITS_thread = threading.Thread(target=voice_vits_seperate(response_JP_sentences, LANGUAGE))
         VITS_thread.start()
     else:

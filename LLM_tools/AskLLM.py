@@ -1,11 +1,12 @@
 import time
-from HealthInfo.InfoUpdate import JSONInfo_update
-from LLM_tools.zhipuai_API import ask_zhipu
+from HealthInfo import InfoUpdate
+from LLM_tools import zhipuai_API
 
 def LLM_module(question):
     Use_LLM = True
     if Use_LLM == True:
-        response = ask_zhipu(question)
+        #response = zhipuai_API.ask_zhipu(question)
+        response = zhipuai_API.ask_character(question)
     else:
         response = question
     #response = '' + question
@@ -13,6 +14,6 @@ def LLM_module(question):
     last_talk_time = time.time()
     filename = 'PersonStatus.json'
     #path = "PersonStatus.json"
-    JSONInfo_update(filename, "last_talk_time", last_talk_time)
+    InfoUpdate.JSONInfo_update(filename, "last_talk_time", last_talk_time)
 
     return response

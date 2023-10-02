@@ -16,16 +16,16 @@ from ASR import Speech_Recognition_Module as ASR
 
 import demand
 from SentimentEngine.SentimentEngine import SentimentEngine
-
+import rmrp
 
 # Setting Function
 SpeechInput_Function = False
 ClientInput_Function = False
 KeyboardInput_Function = True
 VITS_Funtion = True
-VTS_Function = True
+VTS_Function = False
 #不分割文本课程
-VITS_once = False
+VITS_once = True
 SentimentEngineFunction = True
 
 #### recording and speech recognize ####
@@ -38,8 +38,8 @@ def speech_recognition_thread():
     global question_list
     
     while True:
+        Question = ASR.speech_recognition_thread(recognizer)
         if Question != "":
-            Question = ASR.speech_recognition_thread(recognizer)
             QSU.update_questionlist(question_list, Question)
 
 # 定义一个函数inputfromkeyboard，用于从键盘输入内容
@@ -63,7 +63,6 @@ def keyboard_thread():
 app = Flask(__name__)
 def flask_thread():
     app.run(host='0.0.0.0', port=56789)
-
 # 定义/receive_text路由，使用POST方法，用于接收文本
 @app.route('/receive_text', methods=['POST'])
 def receive_text():
@@ -119,8 +118,8 @@ if __name__ == "__main__":
     if KeyboardInput_Function == True:
         keyboardinput_thread.start()  
     #如果VITS_Funtion为True，则启动键盘输入线程
-    if VITS_Funtion == True:
-        playaudio_thread.start()
+    #if VITS_Funtion == False:
+    #    playaudio_thread.start()
                     
     while True:
         
@@ -136,7 +135,10 @@ if __name__ == "__main__":
                 demand.run_task_list(task_number)
             else:
                 #ask GPT for resqonse
+                EMOTION_INFO = '充满爱意'
+                question_current = "(" + EMOTION_INFO + ")" + question_current
                 response = LLM.LLM_module(question_current)
+                response = rmrp.remove_brackets_and_replace(response)
 
                 if SentimentEngineFunction == True:
                     hotkey, Sentiments = EMOTION.expression_detection_module(response)                
@@ -151,12 +153,16 @@ if __name__ == "__main__":
 
                 # VITS voice generation and play
                 if VITS_Funtion == True:
-                    VITS.VITS_module(response, VITS_once, "ja")
+                    #VITS.VITS_module(response, VITS_once, "ja")
+                    VITS_module_thread = threading.Thread(target=lambda: asyncio.run(VITS.VITS_module(response, VITS_once, "ja")))
+                    VITS_module_thread.start()
+                    playaudio_thread = threading.Thread(target=lambda: asyncio.run(VITS.play_all_audio()))
+                    playaudio_thread.start()
                 
                 if VTS_Function == True:
                     motion_hotkey = 1
                     if hotkey != motion_hotkey:
-                        time.sleep(3)
+                        time.sleep(0)
                         asyncio_VTS_thread = threading.Thread(target=lambda: asyncio.run(VTS.VTS_threading(hotkey)))
                         asyncio_VTS_thread.start()
 

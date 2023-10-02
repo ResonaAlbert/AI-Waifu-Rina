@@ -1,18 +1,23 @@
 import threading
 import asyncio
 from VITS_tools.voice_vits import VITS_module
+import sys
 
 def command_mode(question):
     COMMAND = 'COMMAND'
     if question.startswith(COMMAND):
         print("enter command mode!\n")
+
         COMMAND_content = ':WELCOME'
-        if question.find(COMMAND_content) == -1:
-            print("not found command!\n")
-            return False
-        else:
+        if question.find(COMMAND_content) != -1:
             print("found command!\n")
             return 1 # task list　welcome
+        COMMAND_content = ':END'
+        if question.find(COMMAND_content) != -1:
+            print("found command!\n")
+            return 2
+        print("command error!\n")
+        return False
     else:
         return False
     
@@ -30,7 +35,9 @@ def run_task_list(task_number):
         asyncio_VTS_thread.start()
         
         return None
-
+    if task_number == 2:
+        print("task 2:END Program!\n")
+        sys.exit(0)
 
 
 """ print(check_start_with("Hello, world!", "Hello"))  # True

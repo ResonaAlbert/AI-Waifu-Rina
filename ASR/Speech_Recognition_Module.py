@@ -1,14 +1,12 @@
 import speech_recognition as sr
 from tools.QuestionStatusUpdate import update_questionlist
-from main import question_list
 #global question_list
 
 # 定义语音识别线程函数
-def speech_recognition_thread():
+def speech_recognition_thread(recognizer):
     # 定义语音识别对象
     recognizer = sr.Recognizer()
     # 定义全局变量
-    global question_list
     # 定义关键词列表
     keywords = ["你好", "在吗", "奈奈"]
     # 定义聊天状态
@@ -33,7 +31,8 @@ def speech_recognition_thread():
                 if recognized_text != None:
                     print("DuringChatting: ", recognized_text)
                     # 更新问题列表
-                    question_list = update_questionlist(question_list, recognized_text)
+                    return recognized_text
+                
             else:
                 # 识别语音
                 recognized_text = recognizer.recognize_google(audio, language="zh-CN")
@@ -43,12 +42,13 @@ def speech_recognition_thread():
                     if keyword in recognized_text:
                         print("你说的是：", recognized_text)
                         # 更新问题列表
-                        question_list = update_questionlist(question_list, recognized_text)
-                        break
+                        return recognized_text
 
         # 判断是否识别到语音
         except sr.UnknownValueError:
             print("抱歉，无法识别你说的内容。")
+            return ""
         # 判断请求是否错误
         except sr.RequestError as e:
             print("出现请求错误：", e)
+            return ""
