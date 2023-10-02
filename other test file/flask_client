@@ -1,0 +1,28 @@
+from flask import Flask, request, jsonify
+import json
+
+# 定义flask_thread函数，用于启动flask服务
+
+def flask_thread(app):
+    app.run(host='0.0.0.0', port=56789)
+
+# 定义/receive_text路由，使用POST方法，用于接收文本
+@app.route('/receive_text', methods=['POST'])
+def receive_text():
+    # 定义全局变量question_list
+    global question_list
+    # 获取请求中的json数据
+    data = request.get_json()
+    # 从json数据中获取文本
+    received_text = data.get('text')
+    # 打印获取的文本
+    print( "Get Question：", received_text)
+
+    # 调用update_questionlist函数，更新question_list
+    question_list = update_questionlist(question_list, received_text)
+    # 定义返回信息
+    reply = {"message": "Question received successfully"}
+    # 将返回信息转换为json格式
+    reply_json = json.dumps(reply)
+    # 返回json格式的信息
+    return reply_json

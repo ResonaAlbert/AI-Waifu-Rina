@@ -3,25 +3,20 @@ import speech_recognition as sr
 import threading
 import time
 import json
-from flask import Flask, request, jsonify
+from flask import Flask, request
 import asyncio
+
 ########
-from HealthInfo.InfoUpdate import JSONInfo_update, JSONInfo_get
-from VITS_tools.voice_vits import VITS_module, play_all_audio
-from tools.QuestionStatusUpdate import use_questionlist, update_questionlist
-from LLM_tools import AskLLM
-from SentimentEngine.SentimentEngine import SentimentEngine
-from VTS_tools.VTS_Module import VTS_threading
-from cemotion import Cemotion
+from VITS_tools import voice_vits as VITS 
+from tools import QuestionStatusUpdate as QSU
+from VTS_tools import VTS_Module as VTS
+from LLM_tools import AskLLM as LLM
+from Emotion_Detection import expression_detection as EMOTION
+from ASR import Speech_Recognition_Module as ASR
+
 import demand
-from expression_detection import expression_detection_module
-from speech_recognition_module import speech_recognition_Function
-#from LLM_tools.LLM.LLM_module import LLM_module
-#import winsound
-#import random
-#import string
-#from requests_toolbelt.multipart.encoder import MultipartEncoder
-#import requests
+from SentimentEngine.SentimentEngine import SentimentEngine
+
 
 # Setting Function
 SpeechInput_Function = False
@@ -37,8 +32,6 @@ SentimentEngineFunction = True
 # 创建一个Recognizer对象
 recognizer = sr.Recognizer()
 
-
-
 # 定义语音识别线程函数
 def speech_recognition_thread():
     # 定义全局变量
@@ -46,8 +39,8 @@ def speech_recognition_thread():
     
     while True:
         if Question != "":
-            Question = speech_recognition_Function(recognizer)
-            update_questionlist(question_list, Question)
+            Question = ASR.speech_recognition_thread(recognizer)
+            QSU.update_questionlist(question_list, Question)
 
 # 定义一个函数inputfromkeyboard，用于从键盘输入内容
 def keyboard_thread():
@@ -62,7 +55,7 @@ def keyboard_thread():
             print("no input\n")
         # 否则，调用update_questionlist函数，将输入的内容添加到question_list中
         else:
-            question_list = update_questionlist(question_list, Question)
+            question_list = QSU.update_questionlist(question_list, Question)
         # 打印收到的内容
         print('收到问题:', Question)
 
@@ -84,7 +77,7 @@ def receive_text():
     print( "Get Question：", received_text)
 
     # 调用update_questionlist函数，更新question_list
-    question_list = update_questionlist(question_list, received_text)
+    question_list = QSU.update_questionlist(question_list, received_text)
     # 定义返回信息
     reply = {"message": "Question received successfully"}
     # 将返回信息转换为json格式
@@ -95,13 +88,6 @@ def receive_text():
 
 ###### main function #######
 if __name__ == "__main__":
-
-    # SentimentEngine
-    if SentimentEngineFunction == True:
-        dirname, filename = os.path.split(os.path.realpath(__file__))
-        #print(dirname)
-        path = dirname + '\SentimentEngine\paimon_sentiment.onnx'
-        SECheck = SentimentEngine(path)
 
     #initial information
     global question_list
@@ -120,7 +106,7 @@ if __name__ == "__main__":
     keyboardinput_thread = threading.Thread(target=keyboard_thread)
     keyboardinput_thread.daemon = True
     #inputfromkeyboard part
-    playaudio_thread = threading.Thread(target=play_all_audio)
+    playaudio_thread = threading.Thread(target=VITS.play_all_audio)
     playaudio_thread.daemon = True
     
     #如果SpeechInput_Function为True，则启动语音输入线程
@@ -143,20 +129,20 @@ if __name__ == "__main__":
         if question_list[0][0] == True:
 
             #from questionlist check question
-            [exit_question ,question_current] = use_questionlist(question_list)
+            [exit_question ,question_current] = QSU.use_questionlist(question_list)
             
             task_number = demand.command_mode(question_current)
             if task_number != False:
                 demand.run_task_list(task_number)
             else:
                 #ask GPT for resqonse
-                response = AskLLM.LLM_module(question_current)
+                response = LLM.LLM_module(question_current)
 
                 if SentimentEngineFunction == True:
-                    hotkey, Sentiments = expression_detection_module(response)                
+                    hotkey, Sentiments = EMOTION.expression_detection_module(response)                
 
                 if VTS_Function == True:
-                    asyncio_VTS_thread = threading.Thread(target=lambda: asyncio.run(VTS_threading(hotkey)))
+                    asyncio_VTS_thread = threading.Thread(target=lambda: asyncio.run(VTS.VTS_threading(hotkey)))
                     asyncio_VTS_thread.start()
 
                 #show the Q&A
@@ -165,13 +151,13 @@ if __name__ == "__main__":
 
                 # VITS voice generation and play
                 if VITS_Funtion == True:
-                    VITS_module(response, VITS_once, "ja")
+                    VITS.VITS_module(response, VITS_once, "ja")
                 
                 if VTS_Function == True:
                     motion_hotkey = 1
                     if hotkey != motion_hotkey:
                         time.sleep(3)
-                        asyncio_VTS_thread = threading.Thread(target=lambda: asyncio.run(VTS_threading(hotkey)))
+                        asyncio_VTS_thread = threading.Thread(target=lambda: asyncio.run(VTS.VTS_threading(hotkey)))
                         asyncio_VTS_thread.start()
 
         time.sleep(0)
