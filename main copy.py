@@ -141,10 +141,10 @@ if __name__ == "__main__":
                 response = rmrp.remove_brackets_and_replace(response)
 
                 if SentimentEngineFunction == True:
-                    hotkey, Sentiments = EMOTION.expression_detection_module(response)                
+                    VTS_emotion, Sentiments = EMOTION.expression_detection_module_AI(response)                
 
                 if VTS_Function == True:
-                    asyncio_VTS_thread = threading.Thread(target=lambda: asyncio.run(VTS.VTS_threading(hotkey)))
+                    asyncio_VTS_thread = threading.Thread(target=lambda: asyncio.run(VTS.VTS_module(VTS_emotion, True)))
                     asyncio_VTS_thread.start()
 
                 #show the Q&A
@@ -160,10 +160,7 @@ if __name__ == "__main__":
                     playaudio_thread.start()
                 
                 if VTS_Function == True:
-                    motion_hotkey = 1
-                    if hotkey != motion_hotkey:
-                        time.sleep(0)
-                        asyncio_VTS_thread = threading.Thread(target=lambda: asyncio.run(VTS.VTS_threading(hotkey)))
-                        asyncio_VTS_thread.start()
+                    asyncio_VTS_thread = threading.Thread(target=lambda: asyncio.run(VTS.VTS_module(VTS_emotion, False)))
+                    asyncio_VTS_thread.start()
 
         time.sleep(0)

@@ -58,12 +58,13 @@ def play_audio_files(folder_path):
     for audio_file in audio_files:
         audio_path = os.path.join(folder_path, audio_file)
         winsound.PlaySound(audio_path, winsound.SND_FILENAME)
+        os.remove(os.path.join(folder_path, audio_file))
 
     # 获取子文件夹中的所有文件
     #files = os.listdir(folder_path)
     # 逐个删除这些文件
-    for file in audio_files:
-        os.remove(os.path.join(folder_path, file))
+    #for file in audio_files:
+    #    os.remove(os.path.join(folder_path, file))
 
 async def play_all_audio():
     start_time = time.time()
