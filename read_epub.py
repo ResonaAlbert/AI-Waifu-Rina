@@ -11,7 +11,7 @@ try:
         lines = file_contents.splitlines()
         for line in lines:
             if line != '':
-                VITS(text=line)
+                VITS.voice_vits2(text=line)
                 print(line)
                 time.sleep(0.1)
         print(file_contents)

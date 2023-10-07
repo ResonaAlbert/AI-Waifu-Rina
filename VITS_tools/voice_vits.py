@@ -9,8 +9,8 @@ import threading
 import time
 import re
                     
-                     # 736 36
-def voice_vits(text, id=118, format="wav", lang="auto", length=1.1, noise=0.667, noisew=0.8, max=5, filename = "out"):
+                     # 736 36 118 诗歌剧
+def voice_vits(text, id=0, format="wav", lang="auto", length=1.1, noise=0.667, noisew=0.8, max=5, filename = "out"):
     fields = {
         "text": text,
         "id": str(id),
@@ -40,7 +40,42 @@ def voice_vits(text, id=118, format="wav", lang="auto", length=1.1, noise=0.667,
     
     with open(path, "wb") as f:
         f.write(res.content)
-    #winsound.PlaySound(path, winsound.SND_FILENAME)
+    winsound.PlaySound(path, winsound.SND_FILENAME)
+    
+    return path
+
+                     # 736 36 118 诗歌剧
+def voice_vits2(text, id=0, format="wav", lang="auto", length=1.1, noise=0.667, noisew=0.8, max=5, filename = "out"):
+    fields = {
+        "text": text,
+        "id": str(id),
+        "format": format,
+        "lang": lang,
+        "length": str(length),
+        "noise": str(noise),
+        "noisew": str(noisew),
+        "max": str(max)
+    }
+    boundary = '----VoiceConversionFormBoundary' + ''.join(random.sample(string.ascii_letters + string.digits, 16))
+    
+    print("VITS start generate:")
+    
+    #base = "https://artrajz-vits-simple-api.hf.space"
+    base = "http://127.0.0.1:23456"
+    
+    m = MultipartEncoder(fields=fields, boundary=boundary)
+    headers = {"Content-Type": m.content_type}
+    url = f"{base}/voice/bert-vits2?text={text}&id={id}&format=wav&length={length}"
+
+    res = requests.get(url=url)
+    abs_path = os.path.dirname(__file__)
+    path = f"{abs_path}/audio_log/{filename}.wav"
+
+    print("VITS generate:", text)
+    
+    with open(path, "wb") as f:
+        f.write(res.content)
+    winsound.PlaySound(path, winsound.SND_FILENAME)
     
     return path
 
