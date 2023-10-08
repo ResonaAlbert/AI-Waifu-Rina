@@ -7,12 +7,31 @@ hotkey = 0
 #asyncio_VTS_thread.start()
 
 def VTS_motion_MODE(mode):
+    # mode: happy / fear / anger / disgust / normal / love / sad  
     if mode == 'happy':
         motion = -1
         expression = [5, 6]
+    elif mode == 'fear':
+        motion = -1
+        expression = -1 
+    elif mode == 'anger':
+        motion = -1
+        expression = -1 
+    elif mode == 'disgust':
+        motion = -1
+        expression = -1 
+    elif mode == 'normal':
+        motion = -1
+        expression = -1 
+    elif mode == 'love':
+        motion = -1
+        expression = -1 
+    elif mode == 'sad':
+        motion = -1
+        expression = -1 
     else:
         motion = -1
-        expression = -1       
+        expression = -1 
     return motion, expression
 
 # Vtube Studio Function Module
