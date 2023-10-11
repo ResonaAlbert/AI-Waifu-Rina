@@ -1,1 +1,1 @@
-{"name": "Bard", "age": 18, "time": 12345, "heartrate": 100, "exit": true, "last_exit_time": 12345, "last_talk_time": 1696251688.791825, "weather_today": "rain", "weather_tomorrow": "rain", "news_today": "", "face_emotion": "angry"}
+{"name": "Bard", "age": 18, "time": 12345, "heartrate": 100, "exit": true, "last_exit_time": 12345, "last_talk_time": 1697014656.447087, "weather_today": "rain", "weather_tomorrow": "rain", "news_today": "", "face_emotion": "happy", "loveValue": 80, "AI_daily_emotion": "position"}

@@ -9,28 +9,28 @@ hotkey = 0
 def VTS_motion_MODE(mode):
     # mode: happy / fear / anger / disgust / normal / love / sad  
     if mode == 'happy':
-        motion = -1
-        expression = [5, 6]
+        motion = 1
+        expression = [20] # xianhua
     elif mode == 'fear':
         motion = -1
-        expression = -1 
+        expression = [3] #kongbai
     elif mode == 'anger':
         motion = -1
-        expression = -1 
+        expression = [14]  # guzui
     elif mode == 'disgust':
         motion = -1
-        expression = -1 
+        expression = [5] # lianhei
     elif mode == 'normal':
-        motion = -1
+        motion = 1 # rotation
         expression = -1 
     elif mode == 'love':
-        motion = -1
-        expression = -1 
+        motion = 1
+        expression = [6, 19] #aixinyan lianhong
     elif mode == 'sad':
         motion = -1
-        expression = -1 
+        expression = [4] #lianlei liuhan
     else:
-        motion = -1
+        motion = 1 # rotation
         expression = -1 
     return motion, expression
 
@@ -50,6 +50,7 @@ async def VTS_module(emotion, status):
     await myvts.request_authenticate()  # use token
 
     motion, expression_list = VTS_motion_MODE(emotion)
+    print('motion:', motion, 'expression:', expression_list)
     
     hotkeyname_list = ['Scene1.motion3.json', 'rotation.motion3.json', 'yun.exp3.json', 
                        'kongbai.exp3.json', 'lei.exp3.json', 'lianhei.exp3.json', 
@@ -68,17 +69,19 @@ async def VTS_module(emotion, status):
                    '1eb4c74f16fa483eb07128ec058a3230', 'd0ffd701889645cd88106546a5eab26b', 'ff9ad1e8db774ab1aacb0bd4488e2144']
 
     print('Vtuber Move Now!')
+    
+    if expression_list != -1:
+        #expression mode
+        for i in range(len(expression_list)):
+            send_hotkey_request = myvts.vts_request.requestTriggerHotKey(hotkey_list[expression_list[i]])
+            await myvts.request(send_hotkey_request)
+
     if status == True:
         #motion mode
         if motion != -1:
             send_hotkey_request = myvts.vts_request.requestTriggerHotKey(hotkey_list[motion])
             await myvts.request(send_hotkey_request) 
     
-    #expression mode
-    if expression_list != -1:
-        for i in range(expression_list):
-            send_hotkey_request = myvts.vts_request.requestTriggerHotKey(hotkey_list[i])
-            await myvts.request(send_hotkey_request) 
 
     await myvts.close()
 

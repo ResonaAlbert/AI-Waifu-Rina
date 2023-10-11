@@ -15,7 +15,6 @@ from Emotion_Detection import expression_detection as EMOTION
 from ASR import Speech_Recognition_Module as ASR
 
 import demand
-from SentimentEngine.SentimentEngine import SentimentEngine
 import rmrp
 
 # Setting Function
@@ -25,7 +24,7 @@ KeyboardInput_Function = True
 VITS_Funtion = True
 VTS_Function = False
 #不分割文本课程
-VITS_once = True
+VITS_once = False
 SentimentEngineFunction = True
 
 #### recording and speech recognize ####
@@ -84,7 +83,6 @@ def receive_text():
     # 返回json格式的信息
     return reply_json
 
-
 ###### main function #######
 if __name__ == "__main__":
 
@@ -92,7 +90,7 @@ if __name__ == "__main__":
     global question_list
     #first_question = 'みなさん、こんにちは。私はバードです。アメリカから来ました。'
     first_question = '你好，我最爱的人!'
-    question_list = [[True,first_question],[False,'']]
+    question_list = [first_question]
     #question_list = [[False,'],[False,'']]
 
     #speech part
@@ -125,7 +123,7 @@ if __name__ == "__main__":
         
         #question_list [2,2]:
         #status = True/False, content = ""
-        if question_list[0][0] == True:
+        if question_list != []:
 
             #from questionlist check question
             [exit_question ,question_current] = QSU.use_questionlist(question_list)
@@ -134,17 +132,25 @@ if __name__ == "__main__":
             if task_number != False:
                 demand.run_task_list(task_number)
             else:
-                #ask GPT for resqonse
+                #ask LLM for resqonse
                 EMOTION_INFO = '充满爱意'
-                question_current = "(" + EMOTION_INFO + ")" + question_current
+                
+                USER_emotion_status, text_emotion = EMOTION.expression_detection_module_USER(question_current)
+                print('USER_emotion_status:', USER_emotion_status)
+                print('text_emotion:', text_emotion)
+                question_current = "(" + "I am " + USER_emotion_status + ")" + question_current
                 response = LLM.LLM_module(question_current)
                 response = rmrp.remove_brackets_and_replace(response)
 
+                AI_daily_emotion = "positive"
+                
                 if SentimentEngineFunction == True:
-                    VTS_emotion, Sentiments = EMOTION.expression_detection_module_AI(response)                
+                    AI_emotion, AI_Sentiments = EMOTION.expression_detection_module_AI(response, USER_emotion_status, AI_daily_emotion)                
+                    print('AI_emotion:', AI_emotion)    
 
                 if VTS_Function == True:
-                    asyncio_VTS_thread = threading.Thread(target=lambda: asyncio.run(VTS.VTS_module(VTS_emotion, True)))
+
+                    asyncio_VTS_thread = threading.Thread(target=lambda: asyncio.run(VTS.VTS_module(AI_emotion, True)))
                     asyncio_VTS_thread.start()
 
                 #show the Q&A
@@ -154,13 +160,13 @@ if __name__ == "__main__":
                 # VITS voice generation and play
                 if VITS_Funtion == True:
                     #VITS.VITS_module(response, VITS_once, "ja")
+
                     VITS_module_thread = threading.Thread(target=lambda: asyncio.run(VITS.VITS_module(response, VITS_once, "ja")))
                     VITS_module_thread.start()
-                    playaudio_thread = threading.Thread(target=lambda: asyncio.run(VITS.play_all_audio()))
-                    playaudio_thread.start()
-                
-                if VTS_Function == True:
-                    asyncio_VTS_thread = threading.Thread(target=lambda: asyncio.run(VTS.VTS_module(VTS_emotion, False)))
-                    asyncio_VTS_thread.start()
 
-        time.sleep(0)
+                #if playaudio_thread is not None and playaudio_thread.is_alive():
+                VITS_module_thread.join()  # Wait for the playaudio_thread to finish
+
+                if VTS_Function == True:
+                    asyncio_VTS_thread = threading.Thread(target=lambda: asyncio.run(VTS.VTS_module(AI_emotion, False)))
+                    asyncio_VTS_thread.start()

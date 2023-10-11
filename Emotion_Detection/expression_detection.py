@@ -1,6 +1,17 @@
 from cemotion import Cemotion
 from HealthInfo import InfoUpdate as IU
 
+def loveValue_Update(Sentiments):
+    if Sentiments < 0.2:
+        loveValue = IU.JSONInfo_get('./PersonStatus.json', "loveValue")
+        loveValue_new = loveValue - 1
+        IU.JSONInfo_update('./PersonStatus.json', "loveValue", loveValue)
+    if Sentiments > 0.8:
+        loveValue = IU.JSONInfo_get('./PersonStatus.json', "loveValue")
+        loveValue = loveValue + 1
+        IU.JSONInfo_update('./PersonStatus.json', "loveValue", loveValue)
+    return None
+
 def expression_detection_module_AI(response, user_emotion, AI_daily_emotion):
     # happy / fear / anger / disgust / normal / love / sad      
     c = Cemotion()
@@ -37,7 +48,7 @@ def expression_detection_module_AI(response, user_emotion, AI_daily_emotion):
 
     return emotion, Sentiments
 
-def expression_detection_module_USER(Question, audio):        
+def expression_detection_module_USER(Question):        
 # happy / sad / anger / disgust / normal / tired / love 
 
 

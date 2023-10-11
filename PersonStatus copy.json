@@ -1,0 +1,22 @@
+{
+    "name": "Bard", 
+    "age": 18, 
+    "time": 12345, 
+
+    "sleep_quality": "good",
+
+    "heartrate_status": true, 
+    "heartrate": 100, 
+
+    "exist_status": true, 
+    "last_exist_time": 12345, 
+    "last_talk_time": 1696925284.93069, 
+
+    "face_emotion_status": true,
+    "face_emotion": "happy", 
+
+    "loveValue": 80, 
+
+    "AI_daily_emotion": "position"
+
+}

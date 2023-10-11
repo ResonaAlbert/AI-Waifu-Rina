@@ -1,7 +1,8 @@
 import json
 import time
 import os
-
+import numpy as np
+    
 def JSONInfo_update(filename, data_name, Data):
    # Get the absolute path of the current file
    abs_path = os.path.dirname(__file__)
@@ -51,3 +52,18 @@ def JSONInfo_get(json_file_path, data_name):
 
     # 获取指令label的值
     return data[data_name]
+
+def AI_daily_emotion_gen():
+    JloveValue = JSONInfo_get('./PersonStatus.json', "loveValue")
+    emotion_probility  = np.random.uniform(1, 0)
+    if JloveValue > 50:
+        if emotion_probility > 0.3:
+            AI_daily_emotion = "positive"
+        else:
+            AI_daily_emotion = "negative"
+    else:
+        if emotion_probility > 0.7:
+            AI_daily_emotion = "positive"
+        else:
+            AI_daily_emotion = "negative"
+    JSONInfo_update('./PersonStatus.json', "AI_daily_emotion", AI_daily_emotion)
