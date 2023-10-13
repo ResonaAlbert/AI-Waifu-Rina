@@ -3,6 +3,16 @@ import re
 import langid
 from googletrans import Translator, LANGUAGES
 import os
+import pykakasi
+
+
+def convert_kanji_to_hiragana(text):
+    kakasi = pykakasi.kakasi()
+    kakasi.setMode("J", "H")  # 将汉字转换为平假名
+    kakasi.setMode("K", "H")  # 将片假名转换为平假名
+    conv = kakasi.getConverter()
+    result = conv.do(text)
+    return result
 
 # 下载适用于日语的分词器数据
 #nltk.download('punkt')

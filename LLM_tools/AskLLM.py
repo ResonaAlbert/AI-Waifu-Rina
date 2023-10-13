@@ -6,7 +6,8 @@ def LLM_module(question):
     Use_LLM = True
     if Use_LLM == True:
         #response = zhipuai_API.ask_zhipu(question)
-        response = zhipuai_API.ask_character(question)
+        #response = zhipuai_API.ask_character(question)
+        response = 'はるのこうえんは、わたしにとって、とてもおもいでふかいばしょです。これからも、はるになると、こうえんにさんぽにいき、はるのかぜをかんじながら、ゆっくりとすごしたいとおもっています。'
     else:
         response = question
     #response = '' + question

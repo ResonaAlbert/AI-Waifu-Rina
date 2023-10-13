@@ -1,27 +1,51 @@
 from cemotion import Cemotion
 from HealthInfo import InfoUpdate as IU
+from google.cloud import language_v1
+
+def google_sentiment(text):
+    # Instantiates a client
+    client = language_v1.LanguageServiceClient()
+
+    # The text to analyze
+    #text = u"Hello, world!"
+    document = language_v1.Document(
+        content=text, type_=language_v1.Document.Type.PLAIN_TEXT
+    )
+
+    # Detects the sentiment of the text
+    sentiment = client.analyze_sentiment(
+        request={"document": document}
+    ).document_sentiment
+
+    #print("Text: {}".format(text))
+    #print("Sentiment: {}, {}".format(sentiment.score, sentiment.magnitude))
+
+    return sentiment.score
 
 def loveValue_Update(Sentiments):
-    if Sentiments < 0.2:
+    if Sentiments < -0.5:
         loveValue = IU.JSONInfo_get('./PersonStatus.json', "loveValue")
         loveValue_new = loveValue - 1
-        IU.JSONInfo_update('./PersonStatus.json', "loveValue", loveValue)
-    if Sentiments > 0.8:
+        IU.JSONInfo_update('./PersonStatus.json', "loveValue", loveValue_new)
+        print("loveValue: ", loveValue_new)
+    if Sentiments > 0.5:
         loveValue = IU.JSONInfo_get('./PersonStatus.json', "loveValue")
-        loveValue = loveValue + 1
-        IU.JSONInfo_update('./PersonStatus.json', "loveValue", loveValue)
+        loveValue_new = loveValue + 1
+        IU.JSONInfo_update('./PersonStatus.json', "loveValue", loveValue_new)
+        print("loveValue: ", loveValue_new)
     return None
 
 def expression_detection_module_AI(response, user_emotion, AI_daily_emotion):
     # happy / fear / anger / disgust / normal / love / sad      
-    c = Cemotion()
-    Sentiments = c.predict(response)  
+    #c = Cemotion()
+    #Sentiments = c.predict(response)  
     # Sentiments = SECheck.infer(response)
-    print("情感等级: ", Sentiments)
+    Sentiments = google_sentiment(response)
+    print("AI Text Emotion: ", Sentiments)
     if user_emotion == 'normal':
-        if Sentiments >= 0.9: 
+        if Sentiments >= 0.25: 
             emotion = 'happy'
-        elif Sentiments >= 0.7:
+        elif Sentiments >= -0.25:
             emotion = 'normal'
         else:
             emotion = 'disgust'
@@ -50,20 +74,21 @@ def expression_detection_module_AI(response, user_emotion, AI_daily_emotion):
 
 def expression_detection_module_USER(Question):        
 # happy / sad / anger / disgust / normal / tired / love 
-
-
     # sleep quality, heart rate, clock
 
     # text
-    c = Cemotion()
-    text_emotion = c.predict(Question)  
+    #c = Cemotion()
+    #text_emotion = c.predict(Question)  
+    USER_text_emotion = google_sentiment(Question)
+    loveValue_Update(USER_text_emotion)
     # Sentiments = SECheck.infer(response)
-    print("情感等级: ", text_emotion)
+    print("User TEXT Emotion: ", USER_text_emotion)
 
     # audio emotion
 
     # face emotion
     # {0: "Angry", 1: "Disgusted", 2: "Fearful", 3: "happy", 4: "Neutral", 5: "Sad", 6: "Surprised"}
+    # normal happy disgust
     exit = IU.JSONInfo_get('./PersonStatus.json', "exit")
     if exit == True:
         face_emotion = IU.JSONInfo_get('./PersonStatus.json', "face_emotion")
@@ -79,27 +104,31 @@ def expression_detection_module_USER(Question):
                 USER_emotion_status = 'happy'
         elif face_emotion == 'Disgusted':
             USER_emotion_status = 'disgust'
-        else:
+        else: # normal
             if heartrate > 95:           
-                if text_emotion >= 0.9:
+                if USER_text_emotion >= 0.25:
                     USER_emotion_status = 'love'
                 else:
                     USER_emotion_status = 'anger'
             else:
-                if text_emotion >= 0.9:
+                if USER_text_emotion >= 0.25:
                     USER_emotion_status = 'happy'
+                elif USER_text_emotion >= -0.25:
+                    USER_emotion_status = 'normal'
                 else:
-                    USER_emotion_status = 'normal'   
+                    USER_emotion_status = 'disgust'   
     else:
         if heartrate > 95:           
-            if text_emotion >= 0.9:
+            if USER_text_emotion >= 0.25:
                 USER_emotion_status = 'love'
             else:
                 USER_emotion_status = 'anger'
         else:
-            if text_emotion >= 0.9:
+            if USER_text_emotion >= 0.25:
                 USER_emotion_status = 'happy'
+            elif USER_text_emotion >= -0.25:
+                USER_emotion_status = 'normal'
             else:
-                USER_emotion_status = 'normal'            
+                USER_emotion_status = 'disgust'            
 
-    return USER_emotion_status, text_emotion
+    return USER_emotion_status, USER_text_emotion

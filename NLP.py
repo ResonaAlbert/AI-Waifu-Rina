@@ -1,35 +1,22 @@
-import asyncio
-import google.cloud.language_v1
+from google.cloud import language_v1
 
-async def main():
-    # 设置你的API密钥
-    api_key = 'AIzaSyBpHeNt3QOvAPRjeeKktqgsoHSOIDHI23c'
+def  google_sentiment(text):
+    # Instantiates a client
+    client = language_v1.LanguageServiceClient()
 
-    # 创建一个客户端
-    client = google.cloud.language_v1.LanguageServiceClient(credentials=api_key)
+    # The text to analyze
+    text = u"Hello, world!"
+    document = language_v1.Document(
+        content=text, type_=language_v1.Document.Type.PLAIN_TEXT
+    )
 
-    # 要分析的文本
-    text = "这是一段要分析情感的文本。"
+    # Detects the sentiment of the text
+    sentiment = client.analyze_sentiment(
+        request={"document": document}
+    ).document_sentiment
 
-    # 调用情感分析API
-    document = google.cloud.language_v1.Document(content=text, type_=google.cloud.language_v1.Document.Type.PLAIN_TEXT)
-    response = await client.analyze_sentiment(request={'document': document})
+    #print("Text: {}".format(text))
+    #print("Sentiment: {}, {}".format(sentiment.score, sentiment.magnitude))
 
-    # 获取情感分析结果
-    sentiment = response.document_sentiment
-    score = sentiment.score
-    magnitude = sentiment.magnitude
+    return sentiment.score
 
-    # 输出情感分析结果
-    print(f'Sentiment score: {score}')
-    print(f'Sentiment magnitude: {magnitude}')
-
-    # 根据分数判断情感
-    if score > 0:
-        print('正面情感')
-    elif score < 0:
-        print('负面情感')
-    else:
-        print('中性情感')
-
-asyncio.run(main())
