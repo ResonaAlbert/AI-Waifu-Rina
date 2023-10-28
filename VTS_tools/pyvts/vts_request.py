@@ -15,8 +15,6 @@ class VTSRequest:
         developer the your plugin
     plugin_name : dict
         plugin name
-    plugin_icon: str
-        plugin icon
     **kwargs : optional
         other parameters like ``api_version``,
     """
@@ -25,15 +23,14 @@ class VTSRequest:
         self,
         developer: str = config.plugin_default["developer"],
         plugin_name: str = config.plugin_default["plugin_name"],
-        plugin_icon: str = config.plugin_default["plugin_icon"],
         **kwargs
     ):
         """ """
         self.developer = developer
         self.plugin_name = plugin_name
-        self.plugin_icon = plugin_icon
         self.api_version = API_VERSION
         self.api_name = API_NAME
+        self.icon = None
         for key, value in kwargs.items():
             setattr(self, key, value)
 
@@ -85,8 +82,8 @@ class VTSRequest:
             "pluginName": self.plugin_name,
             "pluginDeveloper": self.developer,
         }
-        if self.plugin_icon is not None:
-            data["pluginIcon"] = self.plugin_icon
+        if self.icon is not None:
+            data["pluginIcon"] = self.icon
         return self.BaseRequest(msg_type, data)
 
     def authentication(self, token) -> dict:
@@ -143,43 +140,6 @@ class VTSRequest:
             "positionY": y,
             "rotation": rot,
             "size": size,
-        }
-        return self.BaseRequest(msg_type, data)
-
-    def InjectParameterDataRequest(
-        self,faceFound = falsh, id, value,
-    ) -> dict:
-        """
-        request to move the model
-
-        Args
-        -----------
-            x: float
-                Location of model, x
-            y: float
-                Location of model, y
-            rot : float, optional
-                Rotating angle, range [-360, 360]
-            size : float, optional
-                Zoom ratio, default: 1
-            relative : bool, optional
-                Whether the values are considered to be relative to the current model position
-            move_time : float, optional
-                Time of the move motion
-
-        Returns
-        -------
-            Organized message sending to ``Vtubestudio API``
-        """
-        msg_type = "InjectParameterDataRequest"
-        data = {
-            "faceFound": faceFound,
-            "mode": "set",
-            "parameterValues":
-                {
-                    "id": id,
-                    "value": value,
-                }
         }
         return self.BaseRequest(msg_type, data)
 
@@ -279,6 +239,37 @@ class VTSRequest:
             "parameterValues": [{"id": parameter, "weight": weight, "value": value}],
         }
         return self.BaseRequest("InjectParameterDataRequest", data=data)
+
+    def requestSetMultiParameterValue(
+        self,
+        data: dict = None,
+    ) -> dict:
+        """
+        Set value for any default or custom parameter.
+
+        Args
+        ----------
+        parameter : str
+            Name of the parameter
+        value : float
+            Value of the data, [-1000000, 1000000]
+        weight : float, optional
+            You can mix the your value with vts face tracking parameter, from 0 to 1,
+        face_found : bool, optional
+            if true, you will tell VTubeStudio to consider the user face as found,
+            s.t. you can control when the "tracking lost"
+
+        Returns
+        -------
+            organized message sending to ``Vtubestudio API``
+        """
+#        data = {
+#            "faceFound": face_found,
+#            "mode": mode,
+#            "parameterValues": [{"id": parameter, "weight": weight, "value": value}],
+#        }
+        return self.BaseRequest("InjectParameterDataRequest", data=data)
+        
 
     def requestDeleteCustomParameter(self, parameter) -> dict:
         """

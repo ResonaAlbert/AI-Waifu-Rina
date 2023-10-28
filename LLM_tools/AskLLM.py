@@ -1,13 +1,15 @@
 import time
 from HealthInfo import InfoUpdate
 from LLM_tools import zhipuai_API
+from LLM_tools import ALI
 
 def LLM_module(question):
     Use_LLM = True
     if Use_LLM == True:
         #response = zhipuai_API.ask_zhipu(question)
         #response = zhipuai_API.ask_character(question)
-        response = 'はるのこうえんは、わたしにとって、とてもおもいでふかいばしょです。これからも、はるになると、こうえんにさんぽにいき、はるのかぜをかんじながら、ゆっくりとすごしたいとおもっています。'
+        response = ALI.QWEN(question)
+        #response = 'はるのこうえんは、わたしにとって、とてもおもいでふかいばしょです。これからも、はるになると、こうえんにさんぽにいき、はるのかぜをかんじながら、ゆっくりとすごしたいとおもっています。'
     else:
         response = question
     #response = '' + question

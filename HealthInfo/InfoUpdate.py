@@ -34,7 +34,6 @@ def JSONInfo_update(filename, data_name, Data):
 # Sleep for 5 seconds
 # time.sleep(5)
 
-
 def JSONInfo_get(json_file_path, data_name):
     """
     从指定json文件获取指令label的值

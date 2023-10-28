@@ -35,42 +35,46 @@ def loveValue_Update(Sentiments):
         print("loveValue: ", loveValue_new)
     return None
 
-def expression_detection_module_AI(response, user_emotion, AI_daily_emotion):
+def expression_detection_module_AI(SentimentEngineFunction, response, user_emotion):
     # happy / fear / anger / disgust / normal / love / sad      
     #c = Cemotion()
     #Sentiments = c.predict(response)  
     # Sentiments = SECheck.infer(response)
-    Sentiments = google_sentiment(response)
-    print("AI Text Emotion: ", Sentiments)
-    if user_emotion == 'normal':
-        if Sentiments >= 0.25: 
+    if SentimentEngineFunction == True:
+        AI_daily_emotion = IU.JSONInfo_get('./PersonStatus.json', "AI_daily_emotion")
+        Sentiments = google_sentiment(response)
+        print("AI Text Emotion: ", Sentiments)
+        if user_emotion == 'normal':
+            if Sentiments >= 0.25: 
+                emotion = 'happy'
+            elif Sentiments >= -0.25:
+                emotion = 'normal'
+            else:
+                emotion = 'disgust'
+        elif user_emotion == 'happy':
             emotion = 'happy'
-        elif Sentiments >= -0.25:
-            emotion = 'normal'
+        elif user_emotion == 'anger':
+            emotion = 'fear'
+        elif user_emotion == 'disgust':
+            emotion = 'sad'
+        elif user_emotion == 'tired':
+            emotion = 'fear'
+        elif user_emotion == 'love':
+            emotion = 'love'
+        elif user_emotion == 'sad':
+            emotion = 'fear'
         else:
-            emotion = 'disgust'
-    elif user_emotion == 'happy':
-        emotion = 'happy'
-    elif user_emotion == 'anger':
-        emotion = 'fear'
-    elif user_emotion == 'disgust':
-        emotion = 'sad'
-    elif user_emotion == 'tired':
-        emotion = 'fear'
-    elif user_emotion == 'love':
-        emotion = 'love'
-    elif user_emotion == 'sad':
-        emotion = 'fear'
-    else:
-        emotion = 'normal'
-
-    if AI_daily_emotion == 'negative':
-        if emotion == 'happy':
             emotion = 'normal'
-        if emotion == 'normal':
-            emotion = 'disgust'
 
-    return emotion, Sentiments
+        if AI_daily_emotion == 'negative':
+            if emotion == 'happy':
+                emotion = 'normal'
+            if emotion == 'normal':
+                emotion = 'disgust'
+    else:
+        emotion = "normal"
+
+    return emotion
 
 def expression_detection_module_USER(Question):        
 # happy / sad / anger / disgust / normal / tired / love 
@@ -82,7 +86,7 @@ def expression_detection_module_USER(Question):
     USER_text_emotion = google_sentiment(Question)
     loveValue_Update(USER_text_emotion)
     # Sentiments = SECheck.infer(response)
-    print("User TEXT Emotion: ", USER_text_emotion)
+    # print("User TEXT Emotion: ", USER_text_emotion)
 
     # audio emotion
 
@@ -132,3 +136,13 @@ def expression_detection_module_USER(Question):
                 USER_emotion_status = 'disgust'            
 
     return USER_emotion_status, USER_text_emotion
+
+def Question_Emotion_INFO(Emotionfunction = True, question_current=''):
+    if Emotionfunction == True:
+        USER_emotion_status, text_emotion = expression_detection_module_USER(question_current)
+        # print('USER_emotion_status:', USER_emotion_status)
+        # print('text_emotion:', text_emotion)
+        question_current = "(" + "I am " + USER_emotion_status + " now)" + question_current
+    else:
+        USER_emotion_status = 'normal'
+    return question_current, USER_emotion_status, 

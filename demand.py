@@ -1,6 +1,7 @@
 import threading
 import asyncio
-from VITS_tools.voice_vits import VITS_module
+from VITS_tools import voice_vits as VITS 
+import VTS_tools.VTS_Module as VTS
 import sys
 
 def command_mode(question):
@@ -16,7 +17,10 @@ def command_mode(question):
         if question.find(COMMAND_content) != -1:
             print("found command!\n")
             return 2
-        print("command error!\n")
+        COMMAND_content = ':HUG'
+        if question.find(COMMAND_content) != -1:
+            print("found command!\n")
+            return 3
         return False
     else:
         return False
@@ -24,20 +28,35 @@ def command_mode(question):
 def run_task_list(task_number):
     if task_number == 1:
         print("task 1: COME BACK MODE\n")
-        from VTS_tools.VTS_Module import VTS_threading
         
         response = "おかえりなさい、私の一番好きなお兄ちゃん！"
         VITS_once = True
-        VITS_module(response, VITS_once, "ja")
+        VITS_module_thread = threading.Thread(target=lambda: asyncio.run(VITS.VITS_module(response, VITS_once, "ja")))
+        VITS_module_thread.start()
             
-        hotkey = 1
-        asyncio_VTS_thread = threading.Thread(target=lambda: asyncio.run(VTS_threading(hotkey)))
+        hotkey = 19
+        asyncio_VTS_thread = threading.Thread(target=lambda: asyncio.run(VTS.VTS_threading(hotkey)))
         asyncio_VTS_thread.start()
+        asyncio_VTS_thread.join()
         
         return None
     if task_number == 2:
         print("task 2:END Program!\n")
         sys.exit(0)
+    if task_number == 3:
+        print("task 1: HUG MODE\n")
+        
+        response = "えへへ、お兄さんの体、あったかいです。もっとぎゅってして！"
+        VITS_once = True
+        VITS_module_thread = threading.Thread(target=lambda: asyncio.run(VITS.VITS_module(response, VITS_once, "ja")))
+        VITS_module_thread.start()
+            
+        hotkey = 20
+        asyncio_VTS_thread = threading.Thread(target=lambda: asyncio.run(VTS.VTS_threading(hotkey)))
+        asyncio_VTS_thread.start()
+        asyncio_VTS_thread.join()
+    
+
 
 
 """ print(check_start_with("Hello, world!", "Hello"))  # True

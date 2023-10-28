@@ -14,9 +14,6 @@ def convert_kanji_to_hiragana(text):
     result = conv.do(text)
     return result
 
-# 下载适用于日语的分词器数据
-#nltk.download('punkt')
-
 def split_chinese_text(text):
     # 使用jieba分词将文本分成短句
     sentences = list(jieba.cut(text, cut_all=False))
@@ -95,6 +92,7 @@ def translate_to_japanese(text):
         return str(e)
     
 def check_dir_empty(path):
+
     """
     判断指定文件夹是否为空
 
@@ -109,3 +107,23 @@ def check_dir_empty(path):
         return True
     else:
         return False
+    
+def remove_brackets_and_replace(string):
+  
+  """
+  去掉字符串中括号里的文本，并替换“哥哥”成“欧尼酱”。
+
+  Args:
+    string: 待处理的字符串。
+
+  Returns:
+    处理后的字符串。
+  """
+
+  # 去掉括号里的文本
+  string = re.sub(r"（.*?）", "", string)
+  string = re.sub(r"\(.*?\)", "", string)
+  string = re.sub(r'\n', "", string)
+  string = re.sub(r'\\', "", string)
+  string = re.sub(r"n", "", string)
+  return string

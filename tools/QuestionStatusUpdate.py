@@ -1,5 +1,4 @@
 def use_questionlist(question_list):
-
     if question_list != []:
         status = True
         question = question_list[0]
@@ -7,8 +6,7 @@ def use_questionlist(question_list):
     else:
         status = False
         question = 'did not have question to ask!'
-
-    return [status, question]
+    return question
 
 def update_questionlist(question_list, new_question):
 
