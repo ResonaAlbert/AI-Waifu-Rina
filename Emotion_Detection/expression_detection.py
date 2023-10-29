@@ -27,12 +27,12 @@ def loveValue_Update(Sentiments):
         loveValue = IU.JSONInfo_get('./PersonStatus.json', "loveValue")
         loveValue_new = loveValue - 1
         IU.JSONInfo_update('./PersonStatus.json', "loveValue", loveValue_new)
-        print("loveValue: ", loveValue_new)
+        #print("loveValue: ", loveValue_new)
     if Sentiments > 0.5:
         loveValue = IU.JSONInfo_get('./PersonStatus.json', "loveValue")
         loveValue_new = loveValue + 1
         IU.JSONInfo_update('./PersonStatus.json', "loveValue", loveValue_new)
-        print("loveValue: ", loveValue_new)
+        #print("loveValue: ", loveValue_new)
     return None
 
 def expression_detection_module_AI(SentimentEngineFunction, response, user_emotion):
@@ -43,7 +43,7 @@ def expression_detection_module_AI(SentimentEngineFunction, response, user_emoti
     if SentimentEngineFunction == True:
         AI_daily_emotion = IU.JSONInfo_get('./PersonStatus.json', "AI_daily_emotion")
         Sentiments = google_sentiment(response)
-        print("AI Text Emotion: ", Sentiments)
+        # print("AI Text Emotion: ", Sentiments)
         if user_emotion == 'normal':
             if Sentiments >= 0.25: 
                 emotion = 'happy'

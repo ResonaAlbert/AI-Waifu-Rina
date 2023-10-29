@@ -88,15 +88,17 @@ def CHATBOT(question_current, SentimentEngineFunction):
     #ASK LLM for resqonse
     response = LLM.LLM_module(question_current)
     response = LT.remove_brackets_and_replace(response)
+
+    #limit text
     if len(response) >100:
         response = response[:50]
 
     AI_emotion = EMOTION.expression_detection_module_AI(SentimentEngineFunction, response, USER_emotion_status)                
-    print('AI_emotion:', AI_emotion)    
+    # print('AI_emotion:', AI_emotion)    
 
     if VTS_Function == True:
-        asyncio_VTS_thread = threading.Thread(target=lambda: asyncio.run(VTS.VTS_module(AI_emotion, True)))
-        asyncio_VTS_thread.start()
+        asyncio_VTS_thread_start = threading.Thread(target=lambda: asyncio.run(VTS.VTS_module(AI_emotion, True)))
+        asyncio_VTS_thread_start.start()
 
     #show the Q&A
     print("Q：", question_current)
@@ -110,8 +112,11 @@ def CHATBOT(question_current, SentimentEngineFunction):
         VITS_module_thread.join()  
 
     if VTS_Function == True:
-        asyncio_VTS_thread = threading.Thread(target=lambda: asyncio.run(VTS.VTS_module(AI_emotion, False)))
-        asyncio_VTS_thread.start()
+        asyncio_VTS_thread_end = threading.Thread(target=lambda: asyncio.run(VTS.VTS_module(AI_emotion, False)))
+        asyncio_VTS_thread_end.start()
+
+        asyncio_VTS_thread_start.join()
+        asyncio_VTS_thread_end.join()
 
 
 ###### main function #######
@@ -141,21 +146,13 @@ if __name__ == "__main__":
     #如果KeyboardInput_Function为True，则启动键盘输入线程
     if KeyboardInput_Function == True:
         keyboardinput_thread.start()  
-
-    #playaudio_thread part
-    #playaudio_thread = threading.Thread(target=VITS.play_all_audio)
-    #playaudio_thread.daemon = True
-    #if VITS_Funtion == False:
-    #    playaudio_thread.start()
                     
     while True:
-        
         if question_list != []:
-
             #from questionlist check question
             question_current = QSU.use_questionlist(question_list)
-            task_number = demand.command_mode(question_current)
+            task_number, Info = demand.command_mode(question_current)
             if task_number != False:
-                demand.run_task_list(task_number)
+                demand.run_task_list(task_number, Info)
             else:
                 CHATBOT(question_current, SentimentEngineFunction)

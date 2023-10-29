@@ -15,7 +15,7 @@ def get_sensor_value():
     if response.status_code == 200:
         data = response.json()
         value = data['state']
-        print(value)
+        #print(value)
         int_value = int(value)
         if value == "unavailable":
             return 0
@@ -24,9 +24,17 @@ def get_sensor_value():
     else:
         return 0
 
-def send_command():
+def send_command(Force):
     # 将内容转换为 json 格式
-    data = {'text': "COMMAND:HUG"}
+    if Force == 1:
+        data = {'text': "COMMAND:HUG:FORCE1"}
+    if Force == 2:
+        data = {'text': "COMMAND:HUG:FORCE2"}    
+    if Force == 3:
+        data = {'text': "COMMAND:HUG:FORCE3"}
+    else:
+        data = {'text': "COMMAND:HUG:FORCE1"}
+
     api_url_receive = 'http://localhost:56789/receive_text'
     # 发送请求
     response = json
@@ -41,10 +49,45 @@ def send_command():
         print("发送失败！")
 
 if __name__ == "__main__":
+    HUG_status = 0
     while True:
         value = get_sensor_value()
-        time.sleep(10)
-        if value > 843348:
-            print(value)
-            send_command()
+        value = value/100000
+        if value < 8:
+            if HUG_status != 0:
+                T = time.time() - reaction_time
+                if T > 20:
+                    HUG_status = 0
+                    print('hug mode stop!')
+
+
+        if value > 10:
+            if HUG_status == 0:
+                    # start
+                    HUG_status = 1
+                    reaction_time = time.time()
+                    print('hug mode start!')
+                    print('force 1')
+                    send_command(1)
+        if value > 20:
+            if HUG_status == 1:
+                T = time.time() - reaction_time
+                if T > 20:
+                    HUG_status = 2
+                    send_command(2)
+                    print('force 2')
+                    reaction_time = time.time()
+        if value > 25:
+            if HUG_status == 2:
+                T = time.time() - reaction_time
+                if T > 20:
+                    HUG_status = 2
+                    send_command(3)
+                    print('force 3')
+                    reaction_time = time.time()   
+        time.sleep(5)     
+
+
+
+
 

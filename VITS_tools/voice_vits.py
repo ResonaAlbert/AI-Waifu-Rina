@@ -101,6 +101,8 @@ async def VITS_module(response, VITS_once = False, LANGUAGE = "ja" ):
     VITS_thread = threading.Thread(target=lambda: asyncio.run(voice_vits_seperate(response_JP_sentences, LANGUAGE)))
     VITS_thread.start()
     playaudio_thread = threading.Thread(target=lambda: asyncio.run(play_all_audio(len(response_JP_sentences))))
-    playaudio_thread.start() 
+    playaudio_thread.start()
+    
+    playaudio_thread.join()
 
 
